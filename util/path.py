@@ -18,28 +18,20 @@ def create_data_path():
     return data_path
 
 
-def create_site_path(site):
+def create_date_path(date):
     data_path = create_data_path()
-    site_path = data_path + "/" + site
-    if not os.path.exists(site_path):
-        os.makedirs(site_path)
-    return site_path
-
-
-def create_city_path(site, city):
-    site_path = create_site_path(site)
-    city_path = site_path + "/" + city
-    if not os.path.exists(city_path):
-        os.makedirs(city_path)
-    return city_path
-
-
-def create_date_path(site, city, date):
-    city_path = create_city_path(site, city)
-    date_path = city_path + "/" + date
+    date_path = data_path + "/" + date
     if not os.path.exists(date_path):
         os.makedirs(date_path)
     return date_path
+
+
+def create_type_path(type, date):
+    date_path = create_date_path(date)
+    type_path = date_path + "/" + type
+    if not os.path.exists(type_path):
+        os.makedirs(type_path)
+    return type_path
 
 
 ROOT_PATH = get_root_path()

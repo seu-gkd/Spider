@@ -1,10 +1,13 @@
 class LouPan(object):
 
     def __init__(self, xiaoqu, price, total):
-
+        # 小区名
         self.xiaoqu = xiaoqu
+        # 单价
         self.price = price
+        # 总价
         self.total = total
+        # url
         self.url = 0
 
         ## 基本信息
@@ -39,7 +42,7 @@ class LouPan(object):
         # 规划户数
         self.numPlan = " "
         # 楼盘户型
-        # self.designType = " "
+        self.designType = " "
 
         ## 配套信息
         # 物业公司
@@ -56,12 +59,18 @@ class LouPan(object):
         self.powerSupply = " "
         # 车位
         self.parkingSpace = " "
+        # 周边信息
+        self.nearby = " "
+
+        ## 其他
+        self.area = " "
 
     def text(self):
         return str(self.xiaoqu) + "," + \
                str(self.price) + "," + \
                str(self.total) + "," + \
                str(self.url) + "," + \
+            \
                str(self.propertyType) + "," + \
                str(self.referencePrice) + "," + \
                str(self.projectFeatures) + "," + \
@@ -69,6 +78,7 @@ class LouPan(object):
                str(self.propertyaddress) + "," + \
                str(self.salesOfficeAddress) + "," + \
                str(self.developer) + "," + \
+            \
                str(self.buildingType) + "," + \
                str(self.landscapingRatio) + "," + \
                str(self.siteArea) + "," + \
@@ -76,16 +86,21 @@ class LouPan(object):
                str(self.buildingArea) + "," + \
                str(self.yearofpropertyRights) + "," + \
                str(self.numPlan) + "," + \
+               str(self.designType) + "," + \
+            \
                str(self.propertyCompany) + "," + \
                str(self.parkingRatio) + "," + \
                str(self.propertycosts) + "," + \
                str(self.heatingMethod) + "," + \
                str(self.waterSupplyMethod) + "," + \
                str(self.powerSupply) + "," + \
-               str(self.parkingSpace)
+               str(self.parkingSpace) + "," + \
+               str(self.nearby) + "," + \
+            \
+               str(self.area)
 
-    def feature(self):
-        return "xiaoqu,price,total,url,propertyType,referencePrice,projectFeatures,regionallocation," \
-               "propertyaddress,salesOfficeAddress,developer,buildingType,landscapingRatio,siteArea,floorAreaRatio," \
-               "buildingArea,yearofpropertyRights,numPlan,propertyCompany,parkingRatio,propertycosts,heatingMethod," \
-               "waterSupplyMethod,powerSupply,parkingSpace"
+    # def feature(self):
+    #     return "xiaoqu,price,total,url,propertyType,referencePrice,projectFeatures,regionallocation," \
+    #            "propertyaddress,salesOfficeAddress,developer,buildingType,landscapingRatio,siteArea,floorAreaRatio," \
+    #            "buildingArea,yearofpropertyRights,numPlan,propertyCompany,parkingRatio,propertycosts,heatingMethod," \
+    #            "waterSupplyMethod,powerSupply,parkingSpace"

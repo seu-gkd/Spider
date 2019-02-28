@@ -37,7 +37,6 @@ def getArea(url):
     data = urlopen(req).read().decode('utf8')
     res = etree.HTML(data)
     try:
-        # area = getInfo1(res.xpath("/html/body/div[2]/div[7]/div/div[2]/div[1]/ul/li[1]/ul/li[2]/p[2]/span[1]/text()")).split(' ')[1].split('m²')[0]
         area = res.xpath("/html/body/div[2]/div[7]/div/div[2]/div[1]/ul/li[1]/ul/li[2]/p[2]/span[1]/text()")
         sum = 0
         for i in area:
@@ -56,7 +55,7 @@ class LouPanBaseSpider(object):
         :return: None
         """
         # 保存城市的信息
-        self.today_path = create_date_path("loupan", citiesname[city_name], get_date_string())
+        # self.today_path = create_date_path("loupan", citiesname[city_name], get_date_string())
         csv_file = self.today_path + "/{0}.csv".format(city_name)
         # 总信息
         info_file = DATA_PATH + "/{0}".format("infodata.csv")
@@ -134,6 +133,7 @@ class LouPanBaseSpider(object):
             house_elements = soup.find_all('li', class_="resblock-list")
             for house_elem in house_elements:
                 price = house_elem.find('span', class_="number")
+                unit = house_elem.find('span', class_="desc")
                 total = house_elem.find('div', class_="second")
                 loupan = house_elem.find('a', class_='name')
                 url = house_elem.find('div', class_="resblock-name").a['href']
@@ -144,13 +144,20 @@ class LouPanBaseSpider(object):
                 except Exception as e:
                     price = '0'
 
+                try:
+                    unit = unit.text.strip()
+                except:
+                    unit = ''
+
                 loupan = loupan.text.replace("\n", "")
 
                 try:
-                    total = total.text.strip().replace(u'总价', '')
-                    total = total.replace(u'/套起', '')
+                    total = total.text.strip()
                 except Exception as e:
                     total = '0'
+
+                print("{0} {1} {2} {3}".format(
+                    loupan, str(price) + str(unit), total, url))
 
                 # 作为对象保存
                 loupan = LouPan(loupan, price, total)
@@ -203,8 +210,8 @@ class LouPanBaseSpider(object):
                     print("loupan.projectFeatures Error")
                 #  区域位置 todo
                 try:
-                    loupan.regionallocation = res.xpath("/html/body/div[2]/div[1]/ul[1]/li[4]/span[2]/text()") + \
-                                              res.xpath("/html/body/div[2]/div[1]/ul[1]/li[4]/span[2]/a/text()")
+                    loupan.regionallocation = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[1]/li[4]/span[2]/text()")) + \
+                                              getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[1]/li[4]/span[2]/a/text()"))
 
                     if not loupan.regionallocation:
                         loupan.regionallocation = "暂无信息"
@@ -309,9 +316,12 @@ class LouPanBaseSpider(object):
 
     def start(self):
         self.date_string = get_time_string()
+        self.today_path = create_type_path("loupan", get_date_string())
+
+
         nones = [None for i in range(len(cities))]
 
-        args = zip(zip(cities), nones)
+        args = zip(zip(['sh']), nones)
 
 
         pool = threadpool.ThreadPool(50)
