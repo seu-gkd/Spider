@@ -47,7 +47,11 @@ def getArea(url):
 
 
 class LouPanBaseSpider(object):
-    def collect_city_loupan_data(self, city_name, fmt="csv"):
+    def test_get_loupan_info(self, city_name, region):
+        print("{0}{1}".format(city_name,region))
+        pass
+
+    def collect_city_loupan_data(self, city_name, region, fmt="csv"):
         """
         将指定城市的新房楼盘数据存储下来，默认存为csv文件
         :param city_name: 城市
@@ -55,34 +59,34 @@ class LouPanBaseSpider(object):
         :return: None
         """
         # 保存城市的信息
-        # self.today_path = create_date_path("loupan", citiesname[city_name], get_date_string())
+        # self.today_path = create_date_path("loupan"w, citiesname[city_name], get_date_string())
         csv_file = self.today_path + "/{0}.csv".format(city_name)
         # 总信息
         info_file = DATA_PATH + "/{0}".format("infodata.csv")
 
-        with codecs.open(csv_file, "a+", 'utf-8') as f:
+        with codecs.open(info_file, "a+", 'utf-8') as f:
             # 开始获得需要的板块数据
-            regions, regions_py = get_region(city_name)
-            for region in regions:
-                loupans = self.get_loupan_info(city_name, region)
-                self.total_num = len(loupans)
-                if fmt == "csv":
-                    # f.write("date,city," + loupans[0].feature() + "\n")
-                    for loupan in loupans:
-                        f.write(self.date_string + "," + citiesname[city_name] + "," + regions_py[region] + "," + loupan.text() + "\n")
-                print("{0}{1} done".format(citiesname[city_name],regions_py[region]))
+            a, regions_py = get_region(city_name)
+            loupans = self.get_loupan_info(city_name, region)
+            self.total_num = len(loupans)
+            if fmt == "csv":
+                for loupan in loupans:
+                    f.write(self.date_string + "," + citiesname[city_name] + "," + regions_py[
+                        region] + "," + loupan.text() + "\n")
 
-        try:
-            f1 = open(csv_file, 'rb')
-            f2 = open(info_file , 'a+', encoding='utf-8')
-            d = f1.read()
-            da = d.decode('utf-8', 'replace')
-            f2.write(da)
-            f1.close()
-        except:
-            print("rewrite failed!")
 
-        print("Finish crawl: " + city_name + ", save data to : " + csv_file)
+        #
+        # try:
+        #     f1 = open(csv_file, 'rb')
+        #     f2 = open(info_file , 'a+', encoding='utf-8')
+        #     d = f1.read()
+        #     da = d.decode('utf-8', 'replace')
+        #     f2.write(da)
+        #     f1.close()
+        # except:
+        #     print("rewrite failed!")
+
+        # print("Finish crawl: " + city_name + ", save data to : " + csv_file)
 
     @staticmethod
     def get_loupan_info(city_name, region):
@@ -99,7 +103,7 @@ class LouPanBaseSpider(object):
             response = requests.get(page, timeout=10, headers=headers)
         except:
             print("timed out")
-            time.sleep("")
+            # time.sleep(4)
         html = response.content
         soup = BeautifulSoup(html, "lxml")
 
@@ -112,20 +116,21 @@ class LouPanBaseSpider(object):
             print("\tWarning: only find one page for {0}".format(city_name))
             print(e)
 
-        print(total_page)
+        print("total_page:{0}".format(total_page))
+
 
         # 从第一页开始,一直遍历到最后一页
         headers = create_headers()
         for i in range(1, total_page + 1):
             page = 'http://{0}.fang.ke.com/loupan/{1}/pg{2}'.format(city_name, region, i)
             print("page:" + page)
-            time.sleep(random.randint(0, 16))
+            # time.sleep(random.randint(0, 16))
             response = 0
             try:
                 response = requests.get(page, timeout=10, headers=headers, verify=False)
             except:
                 print("timed out")
-                time.sleep(random.randint(0, 6))
+                # time.sleep(random.randint(0, 6))
             html = response.content
             soup = BeautifulSoup(html, "lxml")
 
@@ -174,7 +179,7 @@ class LouPanBaseSpider(object):
                     data = urlopen(req).read().decode('utf8')
                 except:
                     print("open error")
-                    time.sleep(10)
+                    # time.sleep(10)
                 res = etree.HTML(data)
 
                 loupan.url = url
@@ -185,29 +190,36 @@ class LouPanBaseSpider(object):
                 try:
                     loupan.propertyType = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[1]/li[1]/span[2]/text()"))
                 except:
-                    print("loupan.propertyType Error")
+                    loupan.propertyType = "NaN"
                 # 参考价格
                 try:
-                    loupan.referencePrice = getInfo1(
-                        res.xpath("/html/body/div[2]/div[1]/ul[1]/li[2]/span[2]/span/text()")).split(' ')[1].split('元/平')[0]
+                    #loupan.referencePrice = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[1]/li[2]/span[2]/span/text()")).split(' ')[1].split('元/平')[0]
+                    loupan.referencePrice = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[1]/li[2]/span[2]/span/text()")).split(' ')[1]
 
                 except:
-                    print("loupan.referencePrice Error")
+                    loupan.referencePrice = "NaN"
 
                 if loupan.referencePrice.find('套') > 0:
                     try:
-                        loupan.referencePrice = str(int(float(loupan.referencePrice.split(' ')[1].split('万/套')[0]) * 10000/getArea(infourl)))
+                        loupan.referencePrice = str(loupan.referencePrice.split(' ')[1].split('万/套')[0])
                     except:
                         try:
-                            loupan.referencePrice = str(int(float(loupan.referencePrice.split('万/套')[0]) * 10000 / getArea(infourl)))
+                            loupan.referencePrice = str(float(loupan.referencePrice.split('万/套')[0]))
                         except:
-                            loupan.referencePrice = '暂无售价'
+                            loupan.referencePrice = "NaN"
+
+                # 面积
+                try:
+                    loupan.area = str(getArea(infourl))
+                except:
+                    loupan.area = "NaN"
 
                 # 项目特色
                 try:
                     loupan.projectFeatures = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[1]/li[3]/span[2]/text()"))
                 except:
-                    print("loupan.projectFeatures Error")
+                    loupan.projectFeatures = "NaN"
+
                 #  区域位置 todo
                 try:
                     loupan.regionallocation = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[1]/li[4]/span[2]/text()")) + \
@@ -216,60 +228,65 @@ class LouPanBaseSpider(object):
                     if not loupan.regionallocation:
                         loupan.regionallocation = "暂无信息"
                 except:
-                    print("loupan.regionallocation Error")
+                    loupan.regionallocation = "NaN"
                 # 楼盘地址
                 try:
                     loupan.propertyaddress = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[1]/li[5]/span[2]/text()"))
                 except:
-                    print("loupan.propertyaddress Error")
+                    loupan.propertyaddress = "NaN"
+
                 # 售楼处地址
                 try:
                     loupan.salesOfficeAddress = getInfo1(
                         res.xpath("/html/body/div[2]/div[1]/ul[1]/li[6]/span[2]/text()"))
                 except:
-                    print("loupan.salesOfficeAddress Error")
+                    loupan.salesOfficeAddress = "NaN"
                 # 开发商
                 try:
                     loupan.developer = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[1]/li[7]/span[2]/text()"))
                 except:
-                    print("loupan.developer Error")
+                    loupan.developer = "NaN"
 
                 ## 规划信息
                 # 建筑类型
                 try:
                     loupan.buildingType = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[3]/li[1]/span[2]/text()"))
                 except:
-                    print("loupan.buildingType Error")
+                    loupan.buildingType = "NaN"
                 # 绿化率
                 try:
                     loupan.landscapingRatio = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[3]/li[2]/span[2]/text()"))
                 except:
-                    print("loupan.landscapingRatio Error")
+                    loupan.landscapingRatio = "NaN"
+
                 # 占地面积
                 try:
                     loupan.siteArea = getInfo2(res.xpath("/html/body/div[2]/div[1]/ul[3]/li[3]/span[2]/text()"))
                 except:
-                    print("loupan.siteArea Error")
+                    loupan.siteArea = "NaN"
+
                 # 容积率
                 try:
                     loupan.floorAreaRatio = getInfo2(res.xpath("/html/body/div[2]/div[1]/ul[3]/li[4]/span[2]/text()"))
                 except:
-                    print("loupan.floorAreaRatio Error")
+                    loupan.floorAreaRatio = "NaN"
+
                 # 建筑面积
                 try:
                     loupan.buildingArea = getInfo2(res.xpath("/html/body/div[2]/div[1]/ul[3]/li[5]/span[2]/text()"))
                 except:
-                    print("loupan.buildingArea Error")
+                    loupan.buildingArea = "NaN"
+
                 # 产权年限
                 try:
                     loupan.yearofpropertyRights = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[3]/li[8]/span[2]/text()"))
                 except:
-                    print("loupan.yearofpropertyRights Error")
+                    loupan.yearofpropertyRights = "NaN"
                 # 规划户数
                 try:
                     loupan.numPlan = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[3]/li[7]/span[2]/text()"))
                 except:
-                    print("loupan.numPlan Error")
+                    loupan.numPlan = "NaN"
                 # 楼盘户型
                 # loupan.designType = res.xpath("").extract()
 
@@ -278,38 +295,39 @@ class LouPanBaseSpider(object):
                 try:
                     loupan.propertyCompany = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[4]/li[1]/span[2]/text()"))
                 except:
-                    print("loupan.propertyCompany Error")
+                    loupan.propertyCompany = "NaN"
                 # 车位配比
                 try:
                     loupan.parkingRatio = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[4]/li[2]/span[2]/text()"))
                 except:
-                    print("loupan.parkingRatio Error")
+                    loupan.parkingRatio = "NaN"
+
                 # 物业费
                 try:
                     loupan.propertycosts = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[4]/li[3]/span[2]/text()"))
                 except:
-                    print("loupan.propertycosts Error")
+                    loupan.propertycosts = "NaN"
                 # 供暖方式
                 try:
                     loupan.heatingMethod = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[4]/li[4]/span[2]/text()"))
                 except:
-                    print("loupan.heatingMethod Error")
+                    loupan.heatingMethod = "NaN"
                 # 供水方式
                 try:
                     loupan.waterSupplyMethod = getInfo1(
                         res.xpath("/html/body/div[2]/div[1]/ul[4]/li[5]/span[2]/text()"))
                 except:
-                    print("loupan.waterSupplyMethod Error")
+                    loupan.waterSupplyMethod = "NaN"
                 # 供电方式
                 try:
                     loupan.powerSupply = getInfo1(res.xpath("/html/body/div[2]/div[1]/ul[4]/li[6]/span[2]/text()"))
                 except:
-                    print("loupan.powerSupply Error")
+                    loupan.powerSupply = "NaN"
                 # 车位
                 try:
                     loupan.parkingSpace = getInfo2(res.xpath("/html/body/div[2]/div[1]/ul[4]/li[7]/span[2]/text()"))
                 except:
-                    print("loupan.parkingSpace Error")
+                    loupan.parkingSpace = "NaN"
 
                 loupan_list.append(loupan)
         return loupan_list
@@ -318,17 +336,38 @@ class LouPanBaseSpider(object):
         self.date_string = get_time_string()
         self.today_path = create_type_path("loupan", get_date_string())
 
+        for city in cities:
+            regions, _ = get_region(city)
+            regions = ['huli','tongan','jimei']
+            for region in regions:
+                self.collect_city_loupan_data(city, region)
+                print('{0}{1} done'.format(city,region))
 
-        nones = [None for i in range(len(cities))]
-
-        args = zip(zip(['sh']), nones)
 
 
-        pool = threadpool.ThreadPool(50)
-        my_requests = threadpool.makeRequests(self.collect_city_loupan_data, args)
-        [pool.putRequest(req) for req in my_requests]
-        pool.wait()
-        pool.dismissWorkers(50, do_join=True)
+
+        # arg_city = []
+        # arg_region = []
+        # count = 0
+        # for city in cities:
+        #     regions, _ = get_region(city)
+        #     regions = ['jurong','qinhuai','pukou','liuhe','gaochun','jintanshi','nanqiaoqu']
+        #     city_list = [city for i in range(len(regions))]
+        #     arg_city += city_list
+        #     for region in regions:
+        #         arg_region.append(region)
+        #         count += 1
+        # nones = [None for i in range(len(arg_region))]
+        # args = zip(zip(arg_city,arg_region),nones)
+        # pool = threadpool.ThreadPool(len(arg_region))
+        # my_requests = threadpool.makeRequests(self.collect_city_loupan_data, args)
+        # [pool.putRequest(req) for req in my_requests]
+        # pool.wait()
+        # pool.dismissWorkers(10, do_join=False)
+
+
+
+
 
 
         # for city in cities:

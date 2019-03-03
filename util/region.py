@@ -32,11 +32,12 @@ def get_region(city_name):
             regions_py[py] = name
             count += 1
     except:
-        print("共有{0}个区".format(count))
+        print("共有{0}个区".format(count-1))
 
     return regions, regions_py
 
 
 
 if __name__ == '__main__':
-    a,b = get_region('sh')
+    a,b = get_region('gz')
+    c = 1

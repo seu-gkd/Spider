@@ -63,6 +63,7 @@ class LouPan(object):
         self.nearby = " "
 
         ## 其他
+        # 面积
         self.area = " "
 
     def text(self):
@@ -99,8 +100,11 @@ class LouPan(object):
             \
                str(self.area)
 
-    # def feature(self):
-    #     return "xiaoqu,price,total,url,propertyType,referencePrice,projectFeatures,regionallocation," \
-    #            "propertyaddress,salesOfficeAddress,developer,buildingType,landscapingRatio,siteArea,floorAreaRatio," \
-    #            "buildingArea,yearofpropertyRights,numPlan,propertyCompany,parkingRatio,propertycosts,heatingMethod," \
-    #            "waterSupplyMethod,powerSupply,parkingSpace"
+    def feature(self):
+        return "xiaoqu, price, total, url, propertyType, referencePrice, projectFeatures, " \
+               "regionallocation, propertyaddress, salesOfficeAddress, developer, buildingType, " \
+               "landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, " \
+               "numPlan, designType, propertyCompany, parkingRatio, propertycosts, heatingMethod, " \
+               "waterSupplyMethod, powerSupply, parkingSpace, nearby, area"
+
+    # Date, city, region, xiaoqu, price, total, url, propertyType, referencePrice, projectFeatures, regionallocation, propertyaddress, salesOfficeAddress, developer, buildingType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, numPlan, designType, propertyCompany, parkingRatio, propertycosts, heatingMethod, waterSupplyMethod, powerSupply, parkingSpace, nearby, area,

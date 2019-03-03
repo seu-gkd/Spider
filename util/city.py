@@ -23,4 +23,6 @@ citiesname = {
     'yt': '烟台',
 }
 
-cities = ['bj','cd','cq','cs','dg','dl','fs','gz','hz','hf','jn','nj','qd','sh','sz','su','sy','tj','wh','xm','yt']
+# cities = ['sh', 'bj','cd','cq','cs','dg','dl','fs','gz','hz','hf','jn','nj','qd','sz','su','sy','tj','wh','xm','yt']
+# cities = ['qd','sz','su','sy','tj','wh','xm','yt']
+cities = ['xm']
